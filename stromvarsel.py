@@ -26,9 +26,9 @@ def analyze_prices(json_data, max_price):
     matches = list()
     for entry in json_data:
         if entry["NOK_per_kWh"] > max_price:
-            return entry
+            matches.append(entry)
 
-    return None
+    return matches
 
 
 def get_mailing_list():
@@ -49,6 +49,15 @@ def get_mailing_list():
     return mail_data
 
 
+def get_peak_time_text(peak_data):
+    return (
+        dateutil.parser.isoparse(peak_data["time_start"]).strftime(
+            "%d/%m/%Y %H:%M"
+        )
+        + f" vil strømprisen være {peak_data['NOK_per_kWh']} NOK per kWh\n"
+    )
+
+
 def send_mail(recipient, price_data):
     config = configparser.ConfigParser()
     config.read("credentials.conf")
@@ -60,12 +69,18 @@ def send_mail(recipient, price_data):
     password = config["credentials"]["password"]
 
     message = EmailMessage()
-    peak_time = dateutil.parser.isoparse(price_data["time_start"])
-    message.set_content(
-        "Hei, jeg har laget et program som varsler når strømprisene er høye!\n"
-        + peak_time.strftime("%d/%m/%Y %H:%M")
-        + f" vil strømprisen være {price_data['NOK_per_kWh']} NOK per kWh"
+    message_content = (
+        "Hei,\n"
+        "Dette er en automatisk varslingstjeneste for høye strømpriser!\n"
+        "I morgen vil strømprisene overstige 1 NOK per kWH.\n\n"
     )
+
+    for entry in price_data:
+        message_content += get_peak_time_text(entry)
+
+    message_content += "\nMvh\nStrømprisvarsel"
+    message.set_content(message_content)
+
     message["Subject"] = "Strømprisvarsel"
     message["From"] = sender
     message["To"] = recipient
@@ -85,9 +100,4 @@ def main():
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as ex:
-        print(ex)
-        # with open("/var/log/stromvarsel.log", "a+", encoding="utf-8") as errlog:
-        #     errlog.write("test")
+    main()

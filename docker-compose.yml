@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  stromvarsel:
+    build: .
+    volumes:
+      - ./credentials.conf:/stromvarsel/credentials.conf:ro
+      - ./mailing-list.txt:/stromvarsel/mailing-list.txt:ro

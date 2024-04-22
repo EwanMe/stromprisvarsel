@@ -1,0 +1,21 @@
+{
+  "type": "line",
+  "data": {
+    "labels": {{ times | tojson }},
+    "datasets": [
+      {
+        "label": "Strømpris",
+        "borderColor": "rgb(54, 162, 235)",
+        "borderWidth": 2,
+        "fill": false,
+        "data": {{ prices | tojson }}
+      }
+    ]
+  },
+  "options": {
+    "title": {
+      "display": true,
+      "text": "Strømprisvarsel {{ date }}"
+    }
+  }
+}

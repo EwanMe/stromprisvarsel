@@ -6,3 +6,4 @@ services:
     volumes:
       - ./credentials.conf:/stromvarsel/credentials.conf:ro
       - ./mailing-list.txt:/stromvarsel/mailing-list.txt:ro
+      - ./template.j2:/stromvarsel/template.j2:ro
